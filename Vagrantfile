@@ -17,6 +17,10 @@ Vagrant.configure("2") do |config|
  
   config.vm.network "forwarded_port", guest: 8000, host: 8000
   config.vm.boot_timeout = 800000000
+
+  config.vm.provider :virtualbox do |vb|
+    vb.gui = true
+  end
   config.vm.provision "shell", inline: <<-SHELL
     systemctl disable apt-daily.service
     systemctl disable apt-daily.timer
