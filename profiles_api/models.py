@@ -1,8 +1,9 @@
 from django.db import models
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.models import BaseUserManager
+from django.conf import settings
+
 
 class UserProfileManager(BaseUserManager):
     """Manager for user profiles"""
@@ -13,10 +14,10 @@ class UserProfileManager(BaseUserManager):
             raise ValueError('Users must have an email address')
 
         email = self.normalize_email(email)
-        user = self.model(email=email, name=name,) # create a model 
+        user = self.model(email=email, name=name,)  # create a model
 
-        user.set_password(password) # Hashes the password
-        user.save(using=self._db) #Important to save to db
+        user.set_password(password)  # Hashes the password
+        user.save(using=self._db)  # Important to save to db
 
         return user
 
@@ -29,6 +30,7 @@ class UserProfileManager(BaseUserManager):
         user.save(using=self._db)
 
         return user
+
 
 class UserProfile(AbstractBaseUser, PermissionsMixin):
     """Database model for users in the system"""
@@ -54,3 +56,20 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         """Return string representation of user"""
         return self.email
 # Create your models here.
+
+
+class ProfileFeedItem(models.Model):
+    """Profile Status Update"""
+    user_profile = models.ForeignKey(
+        settings.AUTH_USER_MODEL,  
+        on_delete=models.CASCADE)
+        # Map to user by this way is better bcz
+        # if we wanted to switch to django default user model, we will not need to change foreign key here
+
+    status_text = models.CharField(max_length=255)
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.status_text
+
+
